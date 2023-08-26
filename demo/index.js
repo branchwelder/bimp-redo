@@ -12,6 +12,8 @@ import { HighlightRow } from "../layers/HighlightRow";
 import { HighlightColumn } from "../layers/HighlightColumn";
 import { GridOverlay } from "../layers/GridOverlay";
 
+import { pointerPosition } from "../extensions/pointerPosition";
+
 let state = {
   tool: "draw",
   paletteIndex: 2,
@@ -20,7 +22,6 @@ let state = {
   aspectRatio: [1, 1],
   scale: 1,
   pan: { x: 0, y: 0 },
-  pos: -1,
 };
 
 function updateState(state, action) {
@@ -49,6 +50,7 @@ function start() {
     },
     tools: { brush, flood, line, rect, shift },
     controls: [ToolSelect],
+    extensions: [pointerPosition()],
   });
 
   editor.zoomToFit();

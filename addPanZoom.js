@@ -1,6 +1,6 @@
 import { createListener } from "./utils.js";
 
-export function addPanZoom(el, { bitmap }, dispatch) {
+export function addPanZoom(el, { bitmap, activeTool }, dispatch) {
   const listen = createListener(el);
 
   let mousedown = false;
@@ -12,7 +12,9 @@ export function addPanZoom(el, { bitmap }, dispatch) {
 
   function setTransform(elem) {
     elem.style.transformOrigin = `0px 0px`;
-    elem.style.transform = `translate(${pointX}px, ${pointY}px)`;
+    elem.style.transform = `translate(${Math.floor(pointX)}px, ${Math.floor(
+      pointY
+    )}px)`;
   }
 
   function updateTransformGroups() {
@@ -31,15 +33,7 @@ export function addPanZoom(el, { bitmap }, dispatch) {
   }
 
   listen("pointerdown", "", (e) => {
-    // if (state.activeTool !== "pan") return;
-    // if (state.activeTool !== "pan")
-    //   if (e.shiftKey || e.button === 2) {
-    //     // && e.target.id !== "canvas-container")
-    //     //   return;
-
-    //     return;
-    //   }
-
+    if (activeTool !== "pan") return;
     let currentTargetRect = e.currentTarget.getBoundingClientRect();
     const offX = e.pageX - currentTargetRect.left,
       offY = e.pageY - currentTargetRect.top;
@@ -105,9 +99,6 @@ export function addPanZoom(el, { bitmap }, dispatch) {
     const limitsWidth = limits.x[1] - limits.x[0];
     const limitsHeight = limits.y[1] - limits.y[0];
 
-    // const xScalingFactor = workspaceBB.width / limitsWidth;
-    // const yScalingFactor = workspaceBB.height / limitsHeight;
-
     const xScalingFactor = workspaceBB.width / limitsWidth;
     const yScalingFactor = workspaceBB.height / limitsHeight;
 
@@ -142,6 +133,11 @@ export function addPanZoom(el, { bitmap }, dispatch) {
     updateTransformGroups();
   }
 
+  function syncState(state) {
+    activeTool = state.activeTool;
+    bitmap = state.bitmap;
+  }
+
   return {
     scale: () => scale,
     x: () => pointX,
@@ -150,5 +146,6 @@ export function addPanZoom(el, { bitmap }, dispatch) {
     toWorkspaceCoords,
     setPanZoom,
     zoomToFit,
+    syncState,
   };
 }

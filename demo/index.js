@@ -1,22 +1,18 @@
 import { Bimp } from "../Bimp";
 import { BimpEditor } from "../BimpEditor";
-import { BimpCanvas } from "../layers/BimpCanvas";
 
-import { brush, flood, line, rect, shift } from "../tools";
-import { ToolSelect } from "../BimpToolbox";
+import { brush, flood, line, rect, shift, pan } from "../tools";
+import { toolbox } from "../BimpToolbox";
 
 import { numberGutter } from "../gutters/numberGutter";
 
-import { HighlightCell } from "../layers/HighlightCell";
-import { HighlightRow } from "../layers/HighlightRow";
-import { HighlightColumn } from "../layers/HighlightColumn";
-import { GridOverlay } from "../layers/GridOverlay";
-
 import { pointerPosition } from "../extensions/pointerPosition";
+import { drawingCanvas } from "../extensions/drawingCanvas";
+import { grid } from "../extensions/grid";
+import { highlight } from "../extensions/highlight";
+import { pixel8 } from "../palette";
 
 let state = {
-  tool: "draw",
-  paletteIndex: 2,
   bitmap: Bimp.empty(10, 10, 1),
   selection: [],
   aspectRatio: [1, 1],
@@ -31,13 +27,6 @@ function updateState(state, action) {
 function start() {
   let editor = new BimpEditor(state, {
     parent: document.body,
-    layers: [
-      BimpCanvas,
-      HighlightCell,
-      HighlightRow,
-      HighlightColumn,
-      GridOverlay,
-    ],
     gutters: {
       l: numberGutter({ size: "30px", axis: "vertical" }),
       r: numberGutter({ size: "30px", axis: "vertical" }),
@@ -48,9 +37,13 @@ function start() {
       state = updateState(state, action);
       editor.syncState(state);
     },
-    tools: { brush, flood, line, rect, shift },
-    controls: [ToolSelect],
-    extensions: [pointerPosition()],
+    extensions: [
+      pointerPosition(),
+      drawingCanvas({ palette: pixel8 }),
+      grid(),
+      highlight({ cell: true }),
+      toolbox({ tools: { brush, flood, line, rect, shift, pan } }),
+    ],
   });
 
   editor.zoomToFit();

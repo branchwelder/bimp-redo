@@ -6,7 +6,7 @@ export function pointerPosition() {
       // will get the bitmap position at the DOM coords
       // takes into account the visible range and aspect ratio
       const bounds = parent
-        .querySelector(":scope > .bimp-layers")
+        .querySelector(":scope .bimp-layers")
         .getBoundingClientRect();
 
       const x = Math.floor(
@@ -22,29 +22,18 @@ export function pointerPosition() {
     }
 
     parent
-      .querySelector(":scope > .bimp-layers")
+      .querySelector(":scope .bimp-layers")
       .addEventListener("mousemove", (e) => {
         const { x, y } = posAtCoords(e.clientX, e.clientY);
         if (state.pos.x != x || state.pos.y != y) {
-          if (
-            y < 0 ||
-            x < 0 ||
-            y >= state.bitmap.height ||
-            x >= state.bitmap.width
-          ) {
-            // Not over canvas
-            dispatch({ pos: { x: -1, y: -1 } });
-          } else {
-            dispatch({ pos: { x, y } });
-          }
+          dispatch({ pos: { x, y } });
         }
       });
-    console.log("asdf");
 
-    function syncState(newState) {
-      state = newState;
-    }
-
-    return syncState;
+    return {
+      syncState(newState) {
+        state = newState;
+      },
+    };
   };
 }

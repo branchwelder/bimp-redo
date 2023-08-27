@@ -46,7 +46,6 @@ export class Bimp {
   }
 
   vMirror() {
-    // let arr2d = this.make2d();
     return this.make2d()
       .map((row) => row.toReversed())
       .flat();
@@ -62,6 +61,7 @@ export class Bimp {
   draw(changes) {
     let copy = this.pixels.slice();
     for (let { x, y, color } of changes) {
+      if (x < 0 || y < 0 || x >= this.width || y >= this.height) continue;
       copy[x + y * this.width] = color;
     }
     return new Bimp(this.width, this.height, copy);
@@ -73,13 +73,15 @@ export class Bimp {
   }
 
   flood({ x, y }, color) {
+    const targetColor = this.pixel(x, y);
+    if (targetColor === color) return this.draw([]);
+
     const around = [
       { dx: -1, dy: 0 },
       { dx: 1, dy: 0 },
       { dx: 0, dy: -1 },
       { dx: 0, dy: 1 },
     ];
-    let targetColor = this.pixel(x, y);
     let drawn = [{ x, y, color: color }];
     for (let done = 0; done < drawn.length; done++) {
       for (let { dx, dy } of around) {
@@ -101,14 +103,13 @@ export class Bimp {
   }
 
   shift(dx, dy) {
-    console.log(dx, dy);
     let changes = [];
 
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
         changes.push({
-          x: (x - dx) % this.width,
-          y: (y - dy) % this.height,
+          x: (x - (dx % this.width) + this.width) % this.width,
+          y: (y - (dy % this.height) + this.height) % this.height,
           color: this.pixel(x, y),
         });
       }

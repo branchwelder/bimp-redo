@@ -1,7 +1,7 @@
 import { html, render } from "lit-html";
 
 export function numberGutter({ axis, size }) {
-  function renderGutter(state, parent) {
+  return ({ state, parent }) => {
     const arr = Array.apply(
       null,
       Array(axis == "horizontal" ? state.bitmap.width : state.bitmap.height)
@@ -55,7 +55,5 @@ export function numberGutter({ axis, size }) {
       </div>`;
 
     render(template, parent);
-  }
-
-  return renderGutter;
+  };
 }

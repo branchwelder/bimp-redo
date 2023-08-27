@@ -15,7 +15,7 @@ export class Gutter {
   }
 
   draw(state) {
-    this.gutterFunc(state, this.dom);
+    this.gutterFunc({ state, parent: this.dom });
   }
 
   syncState(state) {

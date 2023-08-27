@@ -3,28 +3,28 @@ import { Gutter } from "./Gutter";
 
 export class BimpEditor {
   constructor(state, config) {
-    let { layers, gutters, dispatch, parent, extensions } = config;
+    let { gutters, dispatch, parent, extensions } = config;
     this.state = state;
 
     this.dom = document.createElement("div");
-    this.dom.className = "bimp-view";
+    this.dom.className = "bimp-wrapper";
 
-    this.layersContainer = this.dom.appendChild(document.createElement("div"));
+    this.workspace = this.dom.appendChild(document.createElement("div"));
+    this.workspace.className = "bimp-workspace";
+    this.layersContainer = this.workspace.appendChild(
+      document.createElement("div")
+    );
     this.layersContainer.className = "bimp-layers";
 
     this.extensions = extensions.map((ext) =>
       ext({ state: this.state, parent: this.dom, dispatch })
     );
 
-    this.layers = layers.map(
-      (Layer) => new Layer(state, { parent: this.layersContainer })
-    );
-
     this.panZoom = addPanZoom(this.layersContainer, this.state, dispatch);
 
     this.gutters = Object.entries(gutters).map(
       ([pos, gutterFunc]) =>
-        new Gutter(state, { parent: this.dom, pos, gutterFunc })
+        new Gutter(state, { parent: this.workspace, pos, gutterFunc })
     );
 
     parent.appendChild(this.dom);
@@ -36,9 +36,9 @@ export class BimpEditor {
 
   syncState(state) {
     this.state = state;
-    for (const extension of this.extensions) extension(state);
+    this.panZoom.syncState(state);
+    for (const extension of this.extensions) extension.syncState(state);
 
-    for (const layer of this.layers) layer.syncState(state, this.panZoom);
     for (const gutter of this.gutters) gutter.syncState(state);
   }
 }

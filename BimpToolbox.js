@@ -1,40 +1,73 @@
-// import { html } from "lit-html";
+import { html, render } from "lit-html";
 
-export class ToolSelect {
-  constructor(state, { tools, dispatch }) {
-    // this.tools = tools.map((Tool) => new Tool());
-    // this.template = html`<div>
-    //   ${Object.entries(tools).map(
-    //     ([toolName, icon]) =>
-    //       html`<input type="radio" name="tool-select" id=${toolName} />
-    //         <label for=${toolName}>
-    //           <i class="fa-solid fa-up-down-left-right"></i>
-    //         </label>`
-    //   )}
-    // </div>`;
-    // @onchange=${(e) => dispatch({ tool: e.target.value })}>
-    // this.select = elt(
-    //   "select",
-    //   {
-    //     onchange: () => dispatch({ tool: this.select.value }),
-    //   },
-    //   ...Object.keys(tools).map((name) =>
-    //     elt(
-    //       "option",
-    //       {
-    //         selected: name == state.tool,
-    //       },
-    //       name
-    //     )
-    //   )
-    // );
-    // this.dom = elt("label", null, "🖌 Tool: ", this.select);
-  }
+function buildToolbox(tools, { state, parent, dispatch }) {
+  state.activeTool = Object.keys(tools)[0];
 
-  // view() {
-  //   return html`<div>${this.tools.map((tool) => tool.view())}</div>`;
-  // }
-  syncState(state) {
-    this.select.value = state.tool;
+  const layers = parent.querySelector(":scope .bimp-layers");
+
+  layers.addEventListener("pointerdown", (e) => {
+    let pos = state.pos;
+    let tool = tools[state.activeTool];
+    let onMove = tool(pos, state, dispatch);
+
+    if (!onMove) return;
+
+    let move = (moveEvent) => {
+      if (moveEvent.buttons == 0) {
+        layers.removeEventListener("mousemove", move);
+      } else {
+        let newPos = state.pos;
+        if (newPos.x == pos.x && newPos.y == pos.y) return;
+        onMove(state.pos, state);
+        pos = newPos;
+      }
+    };
+    layers.addEventListener("mousemove", move);
+  });
+
+  function view(state) {
+    return html`<style>
+        button {
+          padding: 3px 8px;
+          border: 0;
+          outline: 0;
+          border-radius: 4px;
+          background-color: #252525;
+          color: #9e9e9e;
+          cursor: pointer;
+        }
+        button:hover {
+          background-color: #676767;
+        }
+
+        .tool-container {
+          display: flex;
+          gap: 5px;
+        }
+        .active {
+          background-color: #343434;
+          color: #f1f1f1;
+        }
+      </style>
+      <div class="tool-container">
+        ${Object.keys(tools).map(
+          (tool) =>
+            html`<button
+              class=${state.activeTool == tool ? "active" : ""}
+              @click=${() => dispatch({ activeTool: tool })}>
+              ${tool}
+            </button>`
+        )}
+      </div>`;
   }
+  return {
+    syncState(newState) {
+      state = newState;
+      render(view(state), parent);
+    },
+  };
+}
+
+export function toolbox({ tools }) {
+  return (config) => buildToolbox(tools, config);
 }

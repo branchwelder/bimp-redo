@@ -10,29 +10,33 @@ body {
   display: flex;
 }
 
-.bimp-view {
+.bimp-wrapper {
+  display: flex;
+  flex-direction: column;
+  /* width: 100%; */
+  flex: 1;
+}
+
+.bimp-workspace {
   display: grid;
-  grid-template-columns: max-content auto max-content;
-  grid-template-rows: max-content auto max-content;
+  grid-template-columns: max-content 1fr max-content;
+  grid-template-rows: max-content 1fr max-content;
   grid-template-areas:
     ". t ."
     "l c r"
     ". b .";
 
   flex: 1;
+  min-height: 0;
+  min-width: 0;
 }
 
-.bimp-view .bimp-layers {
+.bimp-layers {
   grid-area: c;
   overflow: hidden;
   position: relative;
   border: 1px solid #111;
   background-color: #3f3f3f;
-}
-
-.bimp-canvas {
-  /* box-shadow: 0px 0px 5px black; */
-  /* border: 1px solid #111; */
 }
 
 .bimp-layers > * {
@@ -44,22 +48,23 @@ body {
   user-select: none;
 }
 
-.bimp-view .bimp-gutter-l {
+.bimp-gutter-l {
   grid-area: l;
   justify-self: end;
+  width: min-content;
 }
 
-.bimp-view .bimp-gutter-b {
+.bimp-gutter-b {
   align-self: start;
   grid-area: b;
 }
 
-.bimp-view .bimp-gutter-t {
+.bimp-gutter-t {
   grid-area: t;
   align-self: end;
 }
 
-.bimp-view .bimp-gutter-r {
+.bimp-gutter-r {
   grid-area: r;
   justify-self: start;
 }

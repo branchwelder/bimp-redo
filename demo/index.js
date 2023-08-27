@@ -2,15 +2,15 @@ import { Bimp } from "../Bimp";
 import { BimpEditor } from "../BimpEditor";
 
 import { brush, flood, line, rect, shift, pan } from "../tools";
-import { toolbox } from "../BimpToolbox";
+import { toolbox } from "../toolbox";
 
-import { numberGutter } from "../gutters/numberGutter";
+import { numberGutter } from "../numberGutter";
 
-import { pointerPosition } from "../extensions/pointerPosition";
-import { drawingCanvas } from "../extensions/drawingCanvas";
-import { grid } from "../extensions/grid";
-import { highlight } from "../extensions/highlight";
-import { pixel8 } from "../palette";
+import { pointerPosition } from "../pointerPosition";
+import { drawingCanvas } from "../drawingCanvas";
+import { grid } from "../grid";
+import { highlight } from "../highlight";
+import { stitchPalette, pixel8 } from "../palette";
 
 let state = {
   bitmap: Bimp.empty(10, 10, 1),
@@ -39,7 +39,7 @@ function start() {
     },
     extensions: [
       pointerPosition(),
-      drawingCanvas({ palette: pixel8 }),
+      drawingCanvas({ palette: stitchPalette }),
       grid(),
       highlight({ cell: true }),
       toolbox({ tools: { brush, flood, line, rect, shift, pan } }),

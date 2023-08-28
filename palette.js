@@ -1,3 +1,5 @@
+import { html, render } from "lit-html";
+
 class Palette {
   constructor(entries, drawFunc) {
     this.entries = entries;
@@ -50,45 +52,140 @@ class PixelPalette extends Palette {
   }
 }
 
-class ImagePalette extends Palette {
-  // Draws a symbol
-  constructor(entries) {
-    super(entries);
-    this.drawFunc = this.drawImageTile;
+function symbolPalette(
+  { symbols, showSelect = true },
+  { state, parent, dispatch }
+) {
+  let selected = state.paletteIndex;
+  let dom = document.createElement("div");
+
+  function renderSelection() {
+    if (!showSelect) return;
+    render(
+      html`<style>
+          .palette-select {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+            height: 50px;
+          }
+          .palette-select > img {
+            border: 1px solid black;
+          }
+          .selected {
+            outline: 2px solid white;
+          }
+        </style>
+        <div class="palette-select">
+          ${symbols.map(
+            ({ image, title }, index) =>
+              html`<img
+                class=${index == selected ? "selected" : ""}
+                src=${image.src}
+                title=${title}
+                @click=${() => dispatch({ paletteIndex: index })} />`
+          )}
+        </div> `,
+      dom
+    );
   }
 
-  drawImageTile(ctx, image, width, height) {
-    ctx.drawImage(image, 0, 0, width, height);
+  function draw(paletteIndex, ctx, width, height) {
+    ctx.drawImage(symbols[paletteIndex].image, 0, 0, width, height);
   }
+
+  function syncState({ paletteIndex }) {
+    if (selected != paletteIndex) {
+      selected = paletteIndex;
+      renderSelection();
+    }
+  }
+
+  renderSelection();
+
+  return {
+    draw,
+    dom,
+    syncState,
+  };
 }
 
-const p8 = [
-  [0, 0, 0],
-  [255, 0, 0],
-  [0, 255, 0],
-  [0, 0, 255],
-  [255, 0, 255],
-  [255, 255, 0],
-  [0, 255, 255],
-  [255, 255, 255],
-];
+function pixelPalette(
+  { entries, showSelect = true },
+  { state, parent, dispatch }
+) {
+  let selected = state.paletteIndex;
+  let dom = document.createElement("div");
+  console.log(entries);
 
-async function getImages() {
-  const knit = new Image();
-  knit.src = "/stitchSymbols/knit.png";
-  await knit.decode();
-  const slip = new Image();
-  slip.src = "/stitchSymbols/slip.png";
-  await slip.decode();
-  const tuck = new Image();
-  tuck.src = "/stitchSymbols/tuck.png";
-  await tuck.decode();
-  const purl = new Image();
-  purl.src = "/stitchSymbols/purl.png";
-  await purl.decode();
-  return [knit, purl, slip, tuck];
+  function getRGB([r, g, b]) {
+    try {
+      return `rgb(${r} ${g} ${b})`;
+    } catch (e) {
+      console.warn("Can't destructure palette entries to RGB");
+      return `rgb(0 0 0)`;
+    }
+  }
+
+  function renderSelection() {
+    if (!showSelect) return;
+    render(
+      html`<style>
+          .palette-select {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+            height: 50px;
+            padding: 3px;
+          }
+          .palette-select > div {
+            border: 1px solid black;
+            aspect-ratio: 1;
+          }
+          .selected {
+            outline: 2px solid white;
+          }
+        </style>
+        <div class="palette-select">
+          ${entries.map(
+            (rgb, index) =>
+              html`<div
+                class=${index == selected ? "selected" : ""}
+                style="background-color: ${getRGB(rgb)}"
+                @click=${() => dispatch({ paletteIndex: index })}></div>`
+          )}
+        </div> `,
+      dom
+    );
+  }
+
+  function draw(paletteIndex, ctx, width, height) {
+    ctx.fillStyle = getRGB(entries[paletteIndex]);
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  function syncState({ paletteIndex }) {
+    if (selected != paletteIndex) {
+      selected = paletteIndex;
+      renderSelection();
+    }
+  }
+
+  renderSelection();
+
+  return {
+    draw,
+    dom,
+    syncState,
+  };
 }
-const pixel8 = new PixelPalette(p8);
-const stitchPalette = new ImagePalette(await getImages());
 
-export { pixel8, stitchPalette };
+function buildSymbolPalette(symbols) {
+  return (config) => symbolPalette(symbols, config);
+}
+
+function buildPixelPalette(entries) {
+  return (config) => pixelPalette({ entries }, config);
+}
+
+export { buildPixelPalette, buildSymbolPalette };

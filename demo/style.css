@@ -3,18 +3,17 @@ body {
   margin: 0;
   padding: 0;
   width: 100vw;
-  height: 50vh;
-
+  height: 100vh;
   background-color: #2d2c2c;
   color: #dadada;
-  display: flex;
 }
 
 .bimp-wrapper {
   display: flex;
   flex-direction: column;
-  /* width: 100%; */
-  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  height: 30rem;
 }
 
 .bimp-workspace {
@@ -26,9 +25,10 @@ body {
     "l c r"
     ". b .";
 
-  flex: 1;
+  flex: 1 1 0;
   min-height: 0;
   min-width: 0;
+  overflow: hidden;
 }
 
 .bimp-layers {
@@ -45,13 +45,19 @@ body {
 
 .bimp-gutter {
   overflow: hidden;
+  min-height: 0;
+  min-width: 0;
   user-select: none;
 }
 
 .bimp-gutter-l {
   grid-area: l;
   justify-self: end;
-  width: min-content;
+}
+
+.bimp-gutter-r {
+  grid-area: r;
+  justify-self: start;
 }
 
 .bimp-gutter-b {
@@ -62,9 +68,4 @@ body {
 .bimp-gutter-t {
   grid-area: t;
   align-self: end;
-}
-
-.bimp-gutter-r {
-  grid-area: r;
-  justify-self: start;
 }

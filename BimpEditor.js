@@ -2,8 +2,7 @@ import { addPanZoom } from "./addPanZoom";
 import { Gutter } from "./Gutter";
 
 export class BimpEditor {
-  constructor(state, config) {
-    let { gutters, dispatch, parent, extensions } = config;
+  constructor({ state, gutters = {}, dispatch, parent, components }) {
     this.state = state;
 
     this.dom = document.createElement("div");
@@ -16,8 +15,12 @@ export class BimpEditor {
     );
     this.layersContainer.className = "bimp-layers";
 
-    this.extensions = extensions.map((ext) =>
-      ext({ state: this.state, parent: this.dom, dispatch })
+    this.components = components.flat().map((ext) =>
+      ext({
+        state,
+        parent: this.dom,
+        dispatch,
+      })
     );
 
     this.panZoom = addPanZoom(this.layersContainer, this.state, dispatch);
@@ -37,7 +40,7 @@ export class BimpEditor {
   syncState(state) {
     this.state = state;
     this.panZoom.syncState(state);
-    for (const extension of this.extensions) extension.syncState(state);
+    for (const extension of this.components) extension.syncState(state);
 
     for (const gutter of this.gutters) gutter.syncState(state);
   }

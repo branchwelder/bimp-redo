@@ -1,11 +1,14 @@
-function makeCanvas(palette, { state, parent, dispatch }) {
+function makeCanvas(paletteBuilder, { state, parent, dispatch }) {
   state.paletteIndex = 0;
+
+  let palette = paletteBuilder({ state, parent, dispatch });
 
   let { aspectRatio, scale } = state;
   let bitmap = null;
 
   const dom = document.createElement("canvas");
   parent.querySelector(":scope .bimp-layers").appendChild(dom);
+  parent.appendChild(palette.dom);
 
   fitCanvas(state.bitmap);
 
@@ -59,6 +62,8 @@ function makeCanvas(palette, { state, parent, dispatch }) {
         draw(state.bitmap);
         bitmap = state.bitmap;
       }
+
+      palette.syncState(state);
     },
   };
 }

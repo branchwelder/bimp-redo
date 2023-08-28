@@ -18,6 +18,8 @@ export function numberGutter({ axis, size }) {
           flex-direction: column;
           transform: translateY(${state.pan.y}px);
           width: ${size};
+          min-height: 0;
+          min-width: 0;
         }
 
         .vertical .cell {
@@ -26,12 +28,16 @@ export function numberGutter({ axis, size }) {
           flex-direction: column;
           align-items: center;
           justify-content: center;
+          min-height: 0;
+          min-width: 0;
         }
 
         .horizontal {
           display: flex;
           transform: translateX(${state.pan.x}px);
           height: ${size};
+          min-height: 0;
+          min-width: 0;
         }
 
         .horizontal .cell {
@@ -39,6 +45,8 @@ export function numberGutter({ axis, size }) {
           display: flex;
           align-items: center;
           justify-content: center;
+          min-height: 0;
+          min-width: 0;
         }
 
         .highlight {

@@ -52,10 +52,7 @@ class PixelPalette extends Palette {
   }
 }
 
-function symbolPalette(
-  { symbols, showSelect = true },
-  { state, parent, dispatch }
-) {
+function symbolPalette({ symbols, showSelect = true }, { state, dispatch }) {
   let selected = state.paletteIndex;
   let dom = document.createElement("div");
 
@@ -110,13 +107,9 @@ function symbolPalette(
   };
 }
 
-function pixelPalette(
-  { entries, showSelect = true },
-  { state, parent, dispatch }
-) {
+function pixelPalette({ entries, showSelect = true }, { state, dispatch }) {
   let selected = state.paletteIndex;
   let dom = document.createElement("div");
-  console.log(entries);
 
   function getRGB([r, g, b]) {
     try {

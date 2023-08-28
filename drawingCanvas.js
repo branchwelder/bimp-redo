@@ -7,6 +7,7 @@ function makeCanvas(paletteBuilder, { state, parent, dispatch }) {
   let bitmap = null;
 
   const dom = document.createElement("canvas");
+  dom.style.cssText = "box-shadow: 0px 0px 3px black";
   parent.querySelector(":scope .bimp-layers").appendChild(dom);
   parent.appendChild(palette.dom);
 

@@ -40,8 +40,7 @@ export class BimpEditor {
   syncState(state) {
     this.state = state;
     this.panZoom.syncState(state);
-    for (const extension of this.components) extension.syncState(state);
-
+    for (const component of this.components) component.syncState(state);
     for (const gutter of this.gutters) gutter.syncState(state);
   }
 }

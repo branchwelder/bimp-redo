@@ -58,10 +58,16 @@ export function shift(start, state, dispatch) {
   function onMove({ x, y }) {
     dispatch({ bitmap: state.bitmap.shift(start.x - x, start.y - y) });
   }
-  onMove(start, state);
+  onMove(start);
   return onMove;
 }
 
-export function pan(start, state, dispatch) {
-  // could do something here while panning?
+export function pan(startPos, state, dispatch) {
+  function onMove(currentPos, { pan, scale, aspectRatio }) {
+    const dx = (startPos.x - currentPos.x) * scale * aspectRatio[0];
+    const dy = (startPos.y - currentPos.y) * scale * aspectRatio[1];
+
+    dispatch({ pan: { x: pan.x - dx, y: pan.y - dy } });
+  }
+  return onMove;
 }

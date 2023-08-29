@@ -1,10 +1,9 @@
-function highlightExtension(
+function outlineExtension(
   { state, parent },
   {
     cell = false,
-    row = false,
-    col = false,
-    color = "#00000044",
+    outer = "#000000",
+    inner = "#ffffff",
     container = "workspace",
   }
 ) {
@@ -18,32 +17,22 @@ function highlightExtension(
   function draw() {
     const ctx = dom.getContext("2d");
     ctx.clearRect(0, 0, dom.width, dom.height);
-    ctx.fillStyle = color;
 
-    if (cell) {
-      ctx.fillRect(
-        pos.x * cellSize[0],
-        pos.y * cellSize[1],
-        cellSize[0],
-        cellSize[1]
-      );
-    }
-    if (row) {
-      ctx.fillRect(
-        0,
-        pos.y * cellSize[1],
-        cellSize[0] * bitmap.width,
-        cellSize[1]
-      );
-    }
-    if (col) {
-      ctx.fillRect(
-        pos.x * cellSize[0],
-        0,
-        cellSize[0],
-        cellSize[1] * bitmap.height
-      );
-    }
+    ctx.strokeStyle = inner;
+    ctx.strokeRect(
+      pos.x * cellSize[0] + 0.5,
+      pos.y * cellSize[1] + 0.5,
+      cellSize[0] - 2,
+      cellSize[1] - 2
+    );
+
+    ctx.strokeStyle = outer;
+    ctx.strokeRect(
+      pos.x * cellSize[0] - 0.5,
+      pos.y * cellSize[1] - 0.5,
+      cellSize[0],
+      cellSize[1]
+    );
   }
 
   function resizeCanvas(bitmap) {
@@ -80,6 +69,6 @@ function highlightExtension(
   };
 }
 
-export function highlight(options = {}) {
-  return (config) => highlightExtension(config, options);
+export function outline(options = {}) {
+  return (config) => outlineExtension(config, options);
 }

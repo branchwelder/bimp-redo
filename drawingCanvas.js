@@ -1,17 +1,18 @@
-function makeCanvas(paletteBuilder, { state, parent, dispatch }) {
+function canvasExtension(
+  { state, parent, dispatch },
+  { paletteBuilder, container = "workspace" }
+) {
   state.paletteIndex = 0;
 
   let palette = paletteBuilder({ state, parent, dispatch });
 
-  let { aspectRatio, scale } = state;
+  let { aspectRatio, scale, pan } = state;
   let bitmap = null;
 
   const dom = document.createElement("canvas");
-  dom.style.cssText = "box-shadow: 0px 0px 3px black";
-  parent.querySelector(":scope .bimp-layers").appendChild(dom);
-  parent.appendChild(palette.dom);
-
-  fitCanvas(state.bitmap);
+  dom.style.cssText = "outline: 1px solid black";
+  parent[container].appendChild(dom);
+  parent["sidebarSecondary"].appendChild(palette.dom);
 
   draw(state.bitmap);
   bitmap = state.bitmap;
@@ -39,16 +40,54 @@ function makeCanvas(paletteBuilder, { state, parent, dispatch }) {
     }
   }
 
-  function fitCanvas(bitmap) {
+  function resizeCanvas(bitmap) {
     dom.width = bitmap.width * aspectRatio[0] * scale;
     dom.height = bitmap.height * aspectRatio[1] * scale;
   }
 
+  function positionCanvas() {
+    dom.style.transform = `translate(${pan.x}px, ${pan.y}px)`;
+  }
+
+  function fitCanvas(bitmap) {
+    // Caluculates the nearest whole-pixel scale multiplier that will
+    // fit this bitmap at the current aspect ratio.
+    // There will likely be some padding around the edges - but
+    // the canvas can get blurry when dealing with sub-pixels.
+    const bbox = parent[container].getBoundingClientRect();
+
+    const newScale = Math.min(
+      Math.floor(bbox.width / (bitmap.width * aspectRatio[0])),
+      Math.floor(bbox.height / (bitmap.height * aspectRatio[1]))
+    );
+
+    const x = Math.floor(
+      (bbox.width - bitmap.width * aspectRatio[0] * newScale) / 2
+    );
+    const y = Math.floor(
+      (bbox.height - bitmap.height * aspectRatio[1] * newScale) / 2
+    );
+    dispatch({ scale: newScale, pan: { x, y } });
+  }
+
   return {
+    attached(state) {
+      ({ aspectRatio, scale, bitmap } = state);
+
+      fitCanvas(state.bitmap);
+      draw(state.bitmap);
+    },
     syncState(state) {
       if (
         state.bitmap.width != bitmap.width ||
-        state.bitmap.height != bitmap.height ||
+        state.bitmap.height != bitmap.height
+      ) {
+        resizeCanvas(state.bitmap);
+        fitCanvas(state.bitmap);
+        // draw(state.bitmap);
+        bitmap = state.bitmap;
+      }
+      if (
         state.aspectRatio[0] != aspectRatio[0] ||
         state.aspectRatio[1] != aspectRatio[1] ||
         state.scale != scale
@@ -56,19 +95,28 @@ function makeCanvas(paletteBuilder, { state, parent, dispatch }) {
         bitmap = null;
         aspectRatio = state.aspectRatio;
         scale = state.scale;
-        fitCanvas(state.bitmap);
+        pan = state.pan;
+        resizeCanvas(state.bitmap);
+        positionCanvas();
       }
 
-      if (state.bitmap != bitmap) {
-        draw(state.bitmap);
-        bitmap = state.bitmap;
+      if (state.pan.x != pan.x || state.pan.y || pan.y) {
+        pan = state.pan;
+        positionCanvas();
       }
+
+      // if (state.bitmap != bitmap) {
+      //   draw(state.bitmap);
+      //   bitmap = state.bitmap;
+      // }
+      draw(state.bitmap);
+      bitmap = state.bitmap;
 
       palette.syncState(state);
     },
   };
 }
 
-export function drawingCanvas({ palette }) {
-  return (config) => makeCanvas(palette, config);
+export function drawingCanvas(options = {}) {
+  return (config) => canvasExtension(config, options);
 }

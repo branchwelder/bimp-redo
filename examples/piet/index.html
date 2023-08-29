@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bimp Piet</title>
+    <link rel="stylesheet" href="/bimp.css" />
+    <style>
+      body {
+        margin: 0;
+        background-color: #2d2c2c;
+        color: #fafafa;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Piet</h1>
+    <script type="module">
+      import { piet } from "./piet";
+      piet(document.body);
+    </script>
+  </body>
+</html>

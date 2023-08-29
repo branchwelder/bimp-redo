@@ -1,9 +1,12 @@
 import { html, render } from "lit-html";
 
-function buildToolbox(tools, { state, parent, dispatch }) {
+function toolboxExtension(
+  { state, parent, dispatch },
+  { tools, target = "workspace", container = "sidebarPrimary" }
+) {
   state.activeTool = Object.keys(tools)[0];
 
-  const layers = parent.querySelector(":scope .bimp-layers");
+  const layers = parent[target];
 
   layers.addEventListener("pointerdown", (e) => {
     let pos = state.pos;
@@ -42,6 +45,7 @@ function buildToolbox(tools, { state, parent, dispatch }) {
 
         .tool-container {
           display: flex;
+          flex-direction: column;
           gap: 5px;
         }
         .active {
@@ -60,14 +64,17 @@ function buildToolbox(tools, { state, parent, dispatch }) {
         )}
       </div>`;
   }
+
+  render(view(state), parent[container]);
+
   return {
     syncState(newState) {
       state = newState;
-      render(view(state), parent);
+      render(view(state), parent[container]);
     },
   };
 }
 
-export function toolbox({ tools }) {
-  return (config) => buildToolbox(tools, config);
+export function toolbox(options = {}) {
+  return (config) => toolboxExtension(config, options);
 }

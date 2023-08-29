@@ -1,19 +1,19 @@
 .bimp-wrapper {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   min-height: 0;
   min-width: 0;
-  height: 30rem;
+  flex: 1 1 0;
 }
 
 .bimp-workspace {
   display: grid;
-  grid-template-columns: max-content 1fr max-content;
-  grid-template-rows: max-content 1fr max-content;
+  grid-template-columns: max-content content max-content;
+  grid-template-rows: max-content content max-content;
   grid-template-areas:
-    ". t ."
+    "tl t tr"
     "l c r"
-    ". b .";
+    "bl b br";
 
   flex: 1 1 0;
   min-height: 0;
@@ -25,7 +25,7 @@
   grid-area: c;
   overflow: hidden;
   position: relative;
-  border: 1px solid #111;
+  /* border: 1px solid #111; */
   background-color: #3f3f3f;
 }
 

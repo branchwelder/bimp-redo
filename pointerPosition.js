@@ -1,6 +1,6 @@
 export function pointerTrackingExtension(
   { state, parent, dispatch },
-  { target = "workspace" }
+  { target = "desktop" }
 ) {
   state.pos = { x: -1, y: -1 };
 

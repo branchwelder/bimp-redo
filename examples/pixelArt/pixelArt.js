@@ -5,9 +5,11 @@ import { brush, flood, line, rect, shift, pan } from "/tools";
 import { toolbox } from "/toolbox";
 import { controlPanel } from "/controlPanel";
 import { numberGutter } from "/numberGutter";
+import { grid } from "/grid";
 
 import { drawingCanvas } from "/drawingCanvas";
 import { outline } from "/outline";
+import { highlight } from "/highlight";
 import { buildHexPalette } from "/palette";
 
 const startPalette = [
@@ -37,7 +39,7 @@ function bottomLeft({ bitmap }, gutterPos, size) {
 
 export function pixelArt({ parent = document.body }) {
   let startState = {
-    bitmap: Bimp.empty(10, 10, 0),
+    bitmap: Bimp.empty(50, 50, 1),
     selection: [],
     aspectRatio: [1, 1],
     scale: 1,
@@ -50,6 +52,8 @@ export function pixelArt({ parent = document.body }) {
     components: [
       drawingCanvas({ paletteBuilder: buildHexPalette(startPalette) }),
       outline(),
+      // grid(),
+      // highlight({ cell: true, row: true, col: true }),
       toolbox({
         tools: { brush, flood, line, rect, pan, shift },
         container: "sidebarPrimary",

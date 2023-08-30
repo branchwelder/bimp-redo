@@ -1,17 +1,14 @@
-function makeGrid({ state, parent, dispatch }) {
-  let { aspectRatio, scale, bitmap } = state;
+function makeGrid({ state, parent }, { container = "desktop" }) {
+  let { aspectRatio, scale, bitmap, pan } = state;
   let cellSize = [aspectRatio[0] * scale, aspectRatio[1] * scale];
 
   const dom = document.createElement("canvas");
   dom.style.cssText = `image-rendering: pixelated;`;
-  parent.querySelector(":scope .bimp-layers").appendChild(dom);
-
-  fitCanvas();
-  draw();
+  parent[container].appendChild(dom);
 
   function draw() {
     const ctx = dom.getContext("2d");
-    ctx.translate(0.5, 0.5);
+    ctx.translate(-0.5, -0.5);
 
     ctx.clearRect(0, 0, dom.width, dom.height);
 
@@ -30,9 +27,10 @@ function makeGrid({ state, parent, dispatch }) {
     ctx.stroke();
   }
 
-  function fitCanvas() {
-    dom.width = bitmap.width * cellSize[0];
-    dom.height = bitmap.height * cellSize[1];
+  function updateDom() {
+    dom.width = bitmap.width * aspectRatio[0] * scale;
+    dom.height = bitmap.height * aspectRatio[1] * scale;
+    dom.style.transform = `translate(${pan.x}px, ${pan.y}px)`;
   }
 
   return {
@@ -42,19 +40,20 @@ function makeGrid({ state, parent, dispatch }) {
         state.bitmap.height != bitmap.height ||
         state.aspectRatio[0] != aspectRatio[0] ||
         state.aspectRatio[1] != aspectRatio[1] ||
-        state.scale != scale
+        state.scale != scale ||
+        state.pan.x != pan.x ||
+        state.pan.y != pan.y
       ) {
-        bitmap = state.bitmap;
-        aspectRatio = state.aspectRatio;
-        scale = state.scale;
+        ({ aspectRatio, scale, pan, bitmap } = state);
+
         cellSize = [aspectRatio[0] * scale, aspectRatio[1] * scale];
-        fitCanvas();
+        updateDom();
         draw();
       }
     },
   };
 }
 
-export function grid() {
-  return (config) => makeGrid(config);
+export function grid(options = {}) {
+  return (config) => makeGrid(config, options);
 }

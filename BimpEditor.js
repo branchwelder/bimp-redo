@@ -18,25 +18,50 @@ function defaultLayout(parent) {
         }
         .bimp-center {
           display: flex;
-          flex: 1 1 0;
+          flex: 1 0 0;
           gap: 5px;
         }
         .bimp-workspace {
+          display: grid;
           flex: 1 1 0;
-          border: 1px solid black;
-          background-color: #3f3f3f;
+          gap: 1px;
+          grid-template-areas:
+            ". top ."
+            "left c right"
+            ". bottom .";
           overflow: hidden;
+          grid-template-columns: min-content 1fr min-content;
+          grid-template-rows: min-content 1fr min-content;
+          outline: 1px solid black;
+          background-color: #222222;
+
+          flex: 1 1 0;
+          min-height: 0;
+          min-width: 0;
+        }
+
+        .bimp-workspace > * {
           position: relative;
         }
-        .bimp-workspace > * {
+
+        .bimp-desktop {
+          outline: 1px solid black;
+          background-color: #3f3f3f;
+          grid-area: c;
+        }
+
+        .bimp-desktop > * {
           position: absolute;
+          flex: 1 1 0;
         }
       </style>
       <div class="bimp-container">
         <div class="bimp-taskbar-primary"></div>
         <div class="bimp-center">
           <div class="bimp-sidebar-primary"></div>
-          <div class="bimp-workspace"></div>
+          <div class="bimp-workspace">
+            <div class="bimp-desktop"></div>
+          </div>
           <div class="bimp-sidebar-secondary"></div>
         </div>
         <div class="bimp-taskbar-secondary"></div>
@@ -47,6 +72,7 @@ function defaultLayout(parent) {
   return {
     container: parent.querySelector(":scope .bimp-container"),
     workspace: parent.querySelector(":scope .bimp-workspace"),
+    desktop: parent.querySelector(":scope .bimp-desktop"),
     sidebarPrimary: parent.querySelector(":scope .bimp-sidebar-primary"),
     sidebarSecondary: parent.querySelector(":scope .bimp-sidebar-secondary"),
     taskbarPrimary: parent.querySelector(":scope .bimp-taskbar-primary"),
@@ -77,12 +103,6 @@ export class BimpEditor {
       })
     );
 
-    // this.panZoom = addPanZoom(this.layersContainer, this.state, dispatch);
-
-    // this.gutters = Object.entries(gutters).map(
-    //   ([pos, gutterFunc]) =>
-    //     new Gutter(state, { parent: this.workspace, pos, gutterFunc })
-    // );
     parent.appendChild(this.dom["container"]);
     this.initialized = true;
 
@@ -94,12 +114,9 @@ export class BimpEditor {
   }
 
   syncState(state, changes) {
-    // console.log(changes);
     this.state = state;
-    // this.panZoom.syncState(state);
     this.components.forEach((component) => {
       component.syncState(state);
     });
-    // for (const gutter of this.gutters) gutter.syncState(state);
   }
 }

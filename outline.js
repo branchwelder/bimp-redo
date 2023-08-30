@@ -1,11 +1,6 @@
 function outlineExtension(
   { state, parent },
-  {
-    cell = false,
-    outer = "#000000",
-    inner = "#ffffff",
-    container = "workspace",
-  }
+  { outer = "#000000", inner = "#ffffff", container = "desktop" }
 ) {
   let { aspectRatio, scale, bitmap, pos, pan } = state;
   let cellSize = [aspectRatio[0] * scale, aspectRatio[1] * scale];
@@ -20,27 +15,24 @@ function outlineExtension(
 
     ctx.strokeStyle = inner;
     ctx.strokeRect(
-      pos.x * cellSize[0] + 0.5,
-      pos.y * cellSize[1] + 0.5,
-      cellSize[0] - 2,
-      cellSize[1] - 2
+      pos.x * cellSize[0] + 1.5,
+      pos.y * cellSize[1] + 1.5,
+      cellSize[0] - 3,
+      cellSize[1] - 3
     );
 
     ctx.strokeStyle = outer;
     ctx.strokeRect(
-      pos.x * cellSize[0] - 0.5,
-      pos.y * cellSize[1] - 0.5,
-      cellSize[0],
-      cellSize[1]
+      pos.x * cellSize[0] + 0.5,
+      pos.y * cellSize[1] + 0.5,
+      cellSize[0] - 1,
+      cellSize[1] - 1
     );
   }
 
-  function resizeCanvas(bitmap) {
+  function updateDom() {
     dom.width = bitmap.width * aspectRatio[0] * scale;
     dom.height = bitmap.height * aspectRatio[1] * scale;
-  }
-
-  function positionCanvas() {
     dom.style.transform = `translate(${pan.x}px, ${pan.y}px)`;
   }
 
@@ -54,15 +46,10 @@ function outlineExtension(
         state.scale != scale ||
         state.pos != pos
       ) {
-        pos = state.pos;
-        bitmap = state.bitmap;
-        aspectRatio = state.aspectRatio;
-        scale = state.scale;
-        pan = state.pan;
+        ({ aspectRatio, scale, pan, bitmap, pos } = state);
 
         cellSize = [aspectRatio[0] * scale, aspectRatio[1] * scale];
-        resizeCanvas(bitmap);
-        positionCanvas();
+        updateDom();
         draw();
       }
     },

@@ -1,11 +1,11 @@
 function highlightExtension(
   { state, parent },
   {
-    cell = false,
+    cell = true,
     row = false,
     col = false,
     color = "#00000044",
-    container = "workspace",
+    container = "desktop",
   }
 ) {
   let { aspectRatio, scale, bitmap, pos, pan } = state;
@@ -13,6 +13,7 @@ function highlightExtension(
 
   const dom = document.createElement("canvas");
   dom.style.cssText = `image-rendering: pixelated;`;
+  console.log(parent[container]);
   parent[container].appendChild(dom);
 
   function draw() {

@@ -1,67 +1,114 @@
 import { html, render } from "lit-html";
 
-export function numberGutter({ axis, size }) {
-  return ({ state, parent }) => {
-    const arr = Array.apply(
-      null,
-      Array(axis == "horizontal" ? state.bitmap.width : state.bitmap.height)
-    ).map((x, i) => i);
+function numberArr({ bitmap }, gutterPos, size) {
+  return Array.apply(
+    null,
+    Array(
+      gutterPos == "bottom" || gutterPos == "top" ? bitmap.width : bitmap.height
+    )
+  ).map((x, i) => i + 1);
+}
 
-    function checkHighlight(num) {
-      if (axis == "horizontal" && state.pos.x == num) return true;
-      if (axis == "vertical" && state.pos.y == num) return true;
+export function numberGutterExtension(
+  { state, parent },
+  { gutterPos, size, container = "workspace", gutterFunc = numberArr }
+) {
+  let { bitmap, pan, pos, aspectRatio, scale } = state;
+  let arr = gutterFunc(state, gutterPos, size);
+
+  let dom = document.createElement("div");
+  dom.style.display = "flex";
+  dom.style.gridArea = gutterPos;
+
+  if (gutterPos == "bottom" || gutterPos == "top") {
+    dom.style.height = `${size}px`;
+  } else if (gutterPos == "left" || gutterPos == "right") {
+    dom.style.width = `${size}px`;
+  }
+
+  parent[container].appendChild(dom);
+
+  function checkHighlight(num) {
+    if ((gutterPos == "bottom" || gutterPos == "top") && pos.x == num)
+      return true;
+    if ((gutterPos == "left" || gutterPos == "right") && pos.y == num)
+      return true;
+  }
+
+  function updatePosition() {
+    if (gutterPos == "left" || gutterPos == "right") {
+      dom.style.transform = `translateY(${pan.y}px)`;
+    } else if (gutterPos == "top" || gutterPos == "bottom") {
+      dom.style.transform = `translateX(${pan.x}px)`;
     }
+  }
 
-    const template = html`<style>
-        .vertical {
+  const view = () => {
+    return html`<style>
+        .gutter {
+          background-color: black;
+          font-family: monospace;
+          font-size: 0.8em;
+          font-weight: bold;
+          color: #969696;
+          user-select: none;
+          position: absolute;
           display: flex;
+          gap: 1px;
+          outline: 1px solid black;
+        }
+        .left,
+        .right {
+          height: ${bitmap.height * aspectRatio[1] * scale}px;
           flex-direction: column;
-          transform: translateY(${state.pan.y}px);
-          width: ${size};
-          min-height: 0;
-          min-width: 0;
+          width: 100%;
         }
 
-        .vertical .cell {
-          flex: 0 0 ${state.aspectRatio[1] * state.scale}px;
+        .top,
+        .bottom {
+          width: ${bitmap.width * aspectRatio[0] * scale}px;
+          height: 100%;
+        }
+
+        .cell {
+          flex: 1 1 0;
+          background-color: #2d2c2c;
           display: flex;
-          flex-direction: column;
-          align-items: center;
           justify-content: center;
-          min-height: 0;
-          min-width: 0;
-        }
-
-        .horizontal {
-          display: flex;
-          transform: translateX(${state.pan.x}px);
-          height: ${size};
-          min-height: 0;
-          min-width: 0;
-        }
-
-        .horizontal .cell {
-          flex: 0 0 ${state.aspectRatio[0] * state.scale}px;
-          display: flex;
           align-items: center;
-          justify-content: center;
-          min-height: 0;
-          min-width: 0;
+          overflow: hidden;
+        }
+
+        .gutter > .cell:nth-of-type(odd) {
+          background: #3b3b3b;
         }
 
         .highlight {
-          background-color: #00000044;
+          background-color: #00000044 !important;
+          color: #fafafa !important;
         }
       </style>
-      <div class=${axis}>
+      <div class="gutter ${gutterPos}">
         ${arr.map(
-          (num) =>
-            html`<div class="cell ${checkHighlight(num) ? "highlight" : ""}">
-              ${num + 1}
+          (content, index) =>
+            html`<div class="cell ${checkHighlight(index) ? "highlight" : ""}">
+              ${content}
             </div>`
         )}
       </div>`;
-
-    render(template, parent);
   };
+
+  return {
+    syncState(state) {
+      ({ bitmap, pan, pos, aspectRatio, scale } = state);
+      arr = gutterFunc(state, gutterPos, size);
+
+      updatePosition();
+      render(view(), dom);
+    },
+  };
+}
+
+export function numberGutter(options = {}) {
+  return (config) => numberGutterExtension(config, options);
 }

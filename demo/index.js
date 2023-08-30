@@ -1,7 +1,7 @@
 import { bimpBanner } from "../examples/bimpBanner";
-import { simplePixelArt } from "../examples/simplePixelArt";
+import { pixelArt } from "../examples/pixelArt/pixelArt";
 import { knittingPattern } from "../examples/knittingPattern";
 
 bimpBanner(document.getElementById("banner"));
-simplePixelArt(document.getElementById("simple"));
+pixelArt(document.getElementById("simple"));
 knittingPattern(document.getElementById("knit"));

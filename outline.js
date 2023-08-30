@@ -1,5 +1,8 @@
-function makeGrid({ state, parent }, { container = "desktop" }) {
-  let { aspectRatio, scale, bitmap, pan } = state;
+function outlineExtension(
+  { state, parent },
+  { outer = "#000000", inner = "#ffffff", container = "desktop" }
+) {
+  let { aspectRatio, scale, bitmap, pos, pan } = state;
   let cellSize = [aspectRatio[0] * scale, aspectRatio[1] * scale];
 
   const dom = document.createElement("canvas");
@@ -8,23 +11,23 @@ function makeGrid({ state, parent }, { container = "desktop" }) {
 
   function draw() {
     const ctx = dom.getContext("2d");
-    ctx.translate(-0.5, -0.5);
-
     ctx.clearRect(0, 0, dom.width, dom.height);
 
-    ctx.beginPath();
+    ctx.strokeStyle = inner;
+    ctx.strokeRect(
+      pos.x * cellSize[0] + 1.5,
+      pos.y * cellSize[1] + 1.5,
+      cellSize[0] - 3,
+      cellSize[1] - 3
+    );
 
-    for (let x = 0; x < bitmap.width + 1; x++) {
-      ctx.moveTo(x * cellSize[0], 0);
-      ctx.lineTo(x * cellSize[0], bitmap.height * cellSize[1]);
-    }
-
-    for (let y = 0; y < bitmap.height + 1; y++) {
-      ctx.moveTo(0, y * cellSize[1]);
-      ctx.lineTo(bitmap.width * cellSize[0], y * cellSize[1]);
-    }
-
-    ctx.stroke();
+    ctx.strokeStyle = outer;
+    ctx.strokeRect(
+      pos.x * cellSize[0] + 0.5,
+      pos.y * cellSize[1] + 0.5,
+      cellSize[0] - 1,
+      cellSize[1] - 1
+    );
   }
 
   function updateDom() {
@@ -41,10 +44,9 @@ function makeGrid({ state, parent }, { container = "desktop" }) {
         state.aspectRatio[0] != aspectRatio[0] ||
         state.aspectRatio[1] != aspectRatio[1] ||
         state.scale != scale ||
-        state.pan.x != pan.x ||
-        state.pan.y != pan.y
+        state.pos != pos
       ) {
-        ({ aspectRatio, scale, pan, bitmap } = state);
+        ({ aspectRatio, scale, pan, bitmap, pos } = state);
 
         cellSize = [aspectRatio[0] * scale, aspectRatio[1] * scale];
         updateDom();
@@ -54,6 +56,6 @@ function makeGrid({ state, parent }, { container = "desktop" }) {
   };
 }
 
-export function grid(options = {}) {
-  return (config) => makeGrid(config, options);
+export function outline(options = {}) {
+  return (config) => outlineExtension(config, options);
 }

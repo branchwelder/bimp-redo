@@ -1,30 +1,28 @@
-function makeCanvas(paletteBuilder, { state, parent, dispatch }) {
+function canvasExtension(
+  { state, parent, dispatch },
+  { paletteBuilder, container = "desktop" }
+) {
   state.paletteIndex = 0;
 
   let palette = paletteBuilder({ state, parent, dispatch });
+  let { aspectRatio, scale, pan, bitmap } = state;
 
-  let { aspectRatio, scale } = state;
-  let bitmap = null;
+  let lastDrawn = null;
 
   const dom = document.createElement("canvas");
-  dom.style.cssText = "box-shadow: 0px 0px 3px black";
-  parent.querySelector(":scope .bimp-layers").appendChild(dom);
-  parent.appendChild(palette.dom);
+  dom.style.cssText = "outline: 1px solid black";
+  parent[container].appendChild(dom);
+  parent["sidebarSecondary"].appendChild(palette.dom);
 
-  fitCanvas(state.bitmap);
-
-  draw(state.bitmap);
-  bitmap = state.bitmap;
-
-  function draw(newBitmap) {
+  function draw() {
     // Draws only the pixels that have changed
     const ctx = dom.getContext("2d");
 
-    for (let y = 0; y < newBitmap.height; y++) {
-      for (let x = 0; x < newBitmap.width; x++) {
-        let paletteIndex = newBitmap.pixel(x, y);
+    for (let y = 0; y < bitmap.height; y++) {
+      for (let x = 0; x < bitmap.width; x++) {
+        let paletteIndex = bitmap.pixel(x, y);
 
-        if (bitmap == null || bitmap.pixel(x, y) != paletteIndex) {
+        if (lastDrawn == null || lastDrawn.pixel(x, y) != paletteIndex) {
           ctx.translate(x * aspectRatio[0] * scale, y * aspectRatio[1] * scale);
 
           palette.draw(
@@ -37,38 +35,75 @@ function makeCanvas(paletteBuilder, { state, parent, dispatch }) {
         }
       }
     }
+    lastDrawn = bitmap;
   }
 
-  function fitCanvas(bitmap) {
+  function updateDom() {
     dom.width = bitmap.width * aspectRatio[0] * scale;
     dom.height = bitmap.height * aspectRatio[1] * scale;
+    dom.style.transform = `translate(${pan.x}px, ${pan.y}px)`;
+  }
+
+  function calcCenterFit() {
+    // Caluculates the nearest whole-pixel scale multiplier that will
+    // fit this bitmap at the current aspect ratio.
+    // There will likely be some padding around the edges - but
+    // the canvas can get blurry when dealing with sub-pixels.
+    const bbox = parent[container].getBoundingClientRect();
+
+    const availableWidth = bbox.width;
+    const availableHeight = bbox.height;
+
+    const newScale = Math.min(
+      Math.floor(availableWidth / (bitmap.width * aspectRatio[0])),
+      Math.floor(availableHeight / (bitmap.height * aspectRatio[1]))
+    );
+
+    const x = Math.floor(
+      (availableWidth - bitmap.width * aspectRatio[0] * newScale) / 2
+    );
+    const y = Math.floor(
+      (availableHeight - bitmap.height * aspectRatio[1] * newScale) / 2
+    );
+    dispatch({ scale: newScale, pan: { x, y } });
   }
 
   return {
+    attached(state) {
+      ({ aspectRatio, scale, bitmap } = state);
+      setTimeout(() => calcCenterFit(state.bitmap), 1);
+    },
     syncState(state) {
       if (
         state.bitmap.width != bitmap.width ||
-        state.bitmap.height != bitmap.height ||
+        state.bitmap.height != bitmap.height
+      ) {
+        bitmap = state.bitmap;
+        setTimeout(() => calcCenterFit(), 1);
+        return;
+      }
+
+      if (
         state.aspectRatio[0] != aspectRatio[0] ||
         state.aspectRatio[1] != aspectRatio[1] ||
-        state.scale != scale
+        state.scale != scale ||
+        state.pan.x != pan.x ||
+        state.pan.y != pan.y
       ) {
-        bitmap = null;
-        aspectRatio = state.aspectRatio;
-        scale = state.scale;
-        fitCanvas(state.bitmap);
+        ({ aspectRatio, scale, pan, bitmap } = state);
+        lastDrawn = null;
+        updateDom();
       }
 
-      if (state.bitmap != bitmap) {
-        draw(state.bitmap);
-        bitmap = state.bitmap;
+      if (lastDrawn != state.bitmap) {
+        ({ bitmap } = state);
+        draw();
       }
-
       palette.syncState(state);
     },
   };
 }
 
-export function drawingCanvas({ palette }) {
-  return (config) => makeCanvas(palette, config);
+export function drawingCanvas(options = {}) {
+  return (config) => canvasExtension(config, options);
 }

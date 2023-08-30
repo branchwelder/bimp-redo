@@ -1,16 +1,20 @@
-function makeHighlight(
-  { cell = false, row = false, col = false, color = "#00000044" },
-  { state, parent }
+function highlightExtension(
+  { state, parent },
+  {
+    cell = true,
+    row = false,
+    col = false,
+    color = "#00000044",
+    container = "desktop",
+  }
 ) {
-  let { aspectRatio, scale, bitmap, pos } = state;
+  let { aspectRatio, scale, bitmap, pos, pan } = state;
   let cellSize = [aspectRatio[0] * scale, aspectRatio[1] * scale];
 
   const dom = document.createElement("canvas");
   dom.style.cssText = `image-rendering: pixelated;`;
-  parent.querySelector(":scope .bimp-layers").appendChild(dom);
-
-  fitCanvas();
-  draw();
+  console.log(parent[container]);
+  parent[container].appendChild(dom);
 
   function draw() {
     const ctx = dom.getContext("2d");
@@ -43,9 +47,13 @@ function makeHighlight(
     }
   }
 
-  function fitCanvas() {
-    dom.width = bitmap.width * cellSize[0];
-    dom.height = bitmap.height * cellSize[1];
+  function resizeCanvas(bitmap) {
+    dom.width = bitmap.width * aspectRatio[0] * scale;
+    dom.height = bitmap.height * aspectRatio[1] * scale;
+  }
+
+  function positionCanvas() {
+    dom.style.transform = `translate(${pan.x}px, ${pan.y}px)`;
   }
 
   return {
@@ -62,14 +70,17 @@ function makeHighlight(
         bitmap = state.bitmap;
         aspectRatio = state.aspectRatio;
         scale = state.scale;
+        pan = state.pan;
+
         cellSize = [aspectRatio[0] * scale, aspectRatio[1] * scale];
-        fitCanvas();
+        resizeCanvas(bitmap);
+        positionCanvas();
         draw();
       }
     },
   };
 }
 
-export function highlight({ cell, row, col }) {
-  return (config) => makeHighlight({ cell, row, col }, config);
+export function highlight(options = {}) {
+  return (config) => highlightExtension(config, options);
 }

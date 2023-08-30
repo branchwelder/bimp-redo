@@ -1,57 +1,5 @@
 import { html, render } from "lit-html";
 
-class Palette {
-  constructor(entries, drawFunc) {
-    this.entries = entries;
-    this.drawFunc = drawFunc;
-  }
-
-  addEntry(entry) {
-    this.entries.push(entry);
-  }
-
-  draw(paletteIndex, ctx, width, height) {
-    // a method to draw the specified palette index
-    try {
-      this.drawFunc(ctx, this.entries[paletteIndex], width, height);
-    } catch (e) {
-      console.error("Error in palette draw function!", e);
-    }
-  }
-}
-
-class PixelPalette extends Palette {
-  // Draws a solid color
-  constructor(entries) {
-    super(entries);
-    this.drawFunc = this.drawPixel;
-  }
-
-  getRGB([r, g, b]) {
-    try {
-      return `rgb(${r} ${g} ${b})`;
-    } catch (e) {
-      console.warn("Can't destructure palette entries to RGB");
-      return `rgb(0 0 0)`;
-    }
-  }
-
-  getRGBA(index) {
-    try {
-      const [r, g, b, a] = this.entries[index];
-      return `rgb(${r} ${g} ${b} / ${a})`;
-    } catch (e) {
-      console.warn("Can't destructure palette entries to RGBA");
-      return `rgb(0 0 0 / 0)`;
-    }
-  }
-
-  drawPixel(ctx, value, width, height) {
-    ctx.fillStyle = this.getRGB(value);
-    ctx.fillRect(0, 0, width, height);
-  }
-}
-
 function symbolPalette({ symbols, showSelect = true }, { state, dispatch }) {
   let selected = state.paletteIndex;
   let dom = document.createElement("div");
@@ -62,6 +10,7 @@ function symbolPalette({ symbols, showSelect = true }, { state, dispatch }) {
       html`<style>
           .palette-select {
             display: flex;
+            flex-direction: column;
             gap: 3px;
             justify-content: center;
             height: 50px;
@@ -107,7 +56,71 @@ function symbolPalette({ symbols, showSelect = true }, { state, dispatch }) {
   };
 }
 
-function pixelPalette({ entries, showSelect = true }, { state, dispatch }) {
+function hexPalette(
+  { entries, showSelect = true, selectSize = "30px" },
+  { state, dispatch }
+) {
+  let selected = state.paletteIndex;
+  let dom = document.createElement("div");
+
+  function renderSelection() {
+    if (!showSelect) return;
+    render(
+      html`<style>
+          .palette-select {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            /* justify-content: center; */
+            padding: 3px;
+          }
+          .palette-select > div {
+            border: 1px solid black;
+            min-width: ${selectSize};
+            aspect-ratio: 1;
+          }
+          .selected {
+            outline: 1px solid white;
+          }
+        </style>
+        <div class="palette-select">
+          ${entries.map(
+            (hex, index) =>
+              html`<div
+                class=${index == selected ? "selected" : ""}
+                style="background-color: ${hex}"
+                @click=${() => dispatch({ paletteIndex: index })}></div>`
+          )}
+        </div> `,
+      dom
+    );
+  }
+
+  function draw(paletteIndex, ctx, width, height) {
+    ctx.fillStyle = entries[paletteIndex];
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  function syncState({ paletteIndex }) {
+    if (selected != paletteIndex) {
+      selected = paletteIndex;
+      renderSelection();
+    }
+  }
+
+  renderSelection();
+
+  return {
+    draw,
+    dom,
+    syncState,
+  };
+}
+
+function pixelPalette(
+  { entries, showSelect = true, selectSize = "40px" },
+  { state, dispatch }
+) {
   let selected = state.paletteIndex;
   let dom = document.createElement("div");
 
@@ -126,17 +139,19 @@ function pixelPalette({ entries, showSelect = true }, { state, dispatch }) {
       html`<style>
           .palette-select {
             display: flex;
+            flex-direction: column;
             gap: 3px;
             justify-content: center;
-            height: 50px;
+
             padding: 3px;
           }
           .palette-select > div {
             border: 1px solid black;
+            height: ${selectSize};
             aspect-ratio: 1;
           }
           .selected {
-            outline: 2px solid white;
+            outline: 1px solid white;
           }
         </style>
         <div class="palette-select">
@@ -181,4 +196,8 @@ function buildPixelPalette(entries) {
   return (config) => pixelPalette({ entries }, config);
 }
 
-export { buildPixelPalette, buildSymbolPalette };
+function buildHexPalette(entries) {
+  return (config) => hexPalette({ entries }, config);
+}
+
+export { buildPixelPalette, buildSymbolPalette, buildHexPalette };

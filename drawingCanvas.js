@@ -1,6 +1,11 @@
 function canvasExtension(
   { state, parent, dispatch },
-  { paletteBuilder, container = "desktop" }
+  {
+    paletteBuilder,
+    container = "desktop",
+    paletteSelect = true,
+    palettePosition = "sidebarSecondary",
+  }
 ) {
   state.paletteIndex = 0;
 
@@ -12,7 +17,9 @@ function canvasExtension(
   const dom = document.createElement("canvas");
   dom.style.cssText = "outline: 1px solid black";
   parent[container].appendChild(dom);
-  parent["sidebarSecondary"].appendChild(palette.dom);
+  if (paletteSelect) {
+    parent[palettePosition].appendChild(palette.dom);
+  }
 
   function draw() {
     // Draws only the pixels that have changed

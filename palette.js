@@ -10,7 +10,7 @@ function symbolPalette({ symbols, showSelect = true }, { state, dispatch }) {
       html`<style>
           .palette-select {
             display: flex;
-            flex-direction: column;
+            flex-direction: inherit;
             gap: 3px;
             justify-content: center;
             height: 50px;
@@ -69,9 +69,8 @@ function hexPalette(
       html`<style>
           .palette-select {
             display: flex;
-            flex-direction: column;
+            flex-direction: inherit;
             gap: 3px;
-            /* justify-content: center; */
             padding: 3px;
           }
           .palette-select > div {

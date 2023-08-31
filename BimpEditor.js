@@ -1,5 +1,6 @@
 import { html, render } from "lit-html";
 import { pointerTracker } from "/pointerPosition";
+import { Bimp } from "/Bimp";
 
 const core = [pointerTracker()];
 
@@ -54,6 +55,18 @@ function defaultLayout(parent) {
           position: absolute;
           flex: 1 1 0;
         }
+        .bimp-sidebar-primary,
+        .bimp-sidebar-secondary {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .bimp-taskbar-primary,
+        .bimp-taskbar-secondary {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
       </style>
       <div class="bimp-container">
         <div class="bimp-taskbar-primary"></div>
@@ -79,6 +92,13 @@ function defaultLayout(parent) {
     taskbarSecondary: parent.querySelector(":scope .bimp-taskbar-secondary"),
   };
 }
+
+const defaultState = {
+  bitmap: Bimp.empty(10, 10, 0),
+  aspectRatio: [1, 1],
+  scale: 1,
+  pan: { x: 0, y: 0 },
+};
 
 export class BimpEditor {
   constructor({ state, parent, components, buildLayout = defaultLayout }) {

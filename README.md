@@ -2,13 +2,32 @@
 
 ### todo
 
-- fixed pan/zoom
-- position things in gutters
-- resize canvas
-- download/export
-- upload
+- [x] resize canvas
+- [x] pixel-perfect
+- [x] grid
+  - [ ] major/minor divisions
+  - [ ] adjust to zoom
+- [x] fill hover
+- [x] outline hover
+- [x] aspect ratio
+- tools
+  - [x] brush
+  - [x] shift
+  - [x] flood
+  - [x] line
+  - [x] rect
+  - [x] pan
+  - [ ] zoom
+- gutters
+  - [x] track canvas position
+  - [ ] major/minor divisions
+  - [ ] don't render contents if overflowing
+- [ ] undo history
+- [ ] palette color picker
+- [ ] download/export
+- [ ] upload
 
-### demos
+### demo ideas
 
 - tile + map editor
 - conways game of life

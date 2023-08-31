@@ -14,12 +14,12 @@ function makeGrid({ state, parent }, { container = "desktop" }) {
 
     ctx.beginPath();
 
-    for (let x = 0; x < bitmap.width + 1; x++) {
+    for (let x = 1; x < bitmap.width; x++) {
       ctx.moveTo(x * cellSize[0], 0);
       ctx.lineTo(x * cellSize[0], bitmap.height * cellSize[1]);
     }
 
-    for (let y = 0; y < bitmap.height + 1; y++) {
+    for (let y = 1; y < bitmap.height; y++) {
       ctx.moveTo(0, y * cellSize[1]);
       ctx.lineTo(bitmap.width * cellSize[0], y * cellSize[1]);
     }

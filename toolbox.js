@@ -45,7 +45,7 @@ function toolboxExtension(
 
         .tool-container {
           display: flex;
-          flex-direction: column;
+          flex-direction: inherit;
           gap: 5px;
         }
         .active {

@@ -52,8 +52,6 @@ export function pixelArt({ parent = document.body }) {
     components: [
       drawingCanvas({ paletteBuilder: buildHexPalette(startPalette) }),
       outline(),
-      // grid(),
-      // highlight({ cell: true, row: true, col: true }),
       toolbox({
         tools: { brush, flood, line, rect, pan, shift },
         container: "sidebarPrimary",
@@ -73,8 +71,4 @@ export function pixelArt({ parent = document.body }) {
       }),
     ],
   });
-
-  // editor.dispatch({
-  //   bitmap: editor.state.bitmap.rect({ x: 1, y: 1 }, { x: 2, y: 2 }, 3),
-  // });
 }

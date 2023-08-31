@@ -5,6 +5,7 @@ function resizeControl() {
   function view({ bitmap }, dispatch) {
     return html`<style>
         .resize-control {
+          font-size: 0.8rem;
           display: grid;
           grid-template-columns: auto 1fr max-content 1fr;
           gap: 5px;

@@ -12,27 +12,43 @@ import { highlight } from "/highlight";
 import { buildSymbolPalette } from "/palette";
 import { controlPanel } from "/controlPanel";
 
+import knitUrl from "./stitchSymbols/knit.png";
+import slipUrl from "./stitchSymbols/slip.png";
+import tuckUrl from "./stitchSymbols/tuck.png";
+import purlUrl from "./stitchSymbols/purl.png";
+
 async function initPalette() {
   const knit = new Image();
-  knit.src = "/examples/knitting/stitchSymbols/knit.png";
+  knit.src = knitUrl;
   await knit.decode();
   const slip = new Image();
-  slip.src = "/examples/knitting/stitchSymbols/slip.png";
+  slip.src = slipUrl;
   await slip.decode();
   const tuck = new Image();
-  tuck.src = "/examples/knitting/stitchSymbols/tuck.png";
+  tuck.src = tuckUrl;
   await tuck.decode();
   const purl = new Image();
-  purl.src = "/examples/knitting/stitchSymbols/purl.png";
+  purl.src = purlUrl;
   await purl.decode();
-  return {
-    symbols: [
-      { image: knit, title: "Knit" },
-      { image: purl, title: "Purl" },
-      { image: slip, title: "Slip" },
-      { image: tuck, title: "Tuck" },
-    ],
-  };
+
+  const symbols = [
+    { image: knit, title: "Knit" },
+    { image: purl, title: "Purl" },
+    { image: slip, title: "Slip" },
+    { image: tuck, title: "Tuck" },
+  ];
+  console.log(symbols);
+
+  return { symbols };
+
+  // return {
+  //   symbols: [
+  //     { image: knit, title: "Knit" },
+  //     { image: purl, title: "Purl" },
+  //     { image: slip, title: "Slip" },
+  //     { image: tuck, title: "Tuck" },
+  //   ],
+  // };
 }
 
 function bottomLeft({ bitmap }, gutterPos, size) {
@@ -45,38 +61,31 @@ function bottomLeft({ bitmap }, gutterPos, size) {
   }
 }
 
-const stitchPalette = buildSymbolPalette(await initPalette());
-
-export function knittingPattern(parent) {
+export async function knittingPattern(parent) {
   let state = {
     bitmap: Bimp.empty(20, 20, 1),
-    selection: [],
     aspectRatio: [1, 1],
     scale: 1,
     pan: { x: 0, y: 0 },
   };
 
-  function updateState(state, action) {
-    return { ...state, ...action };
-  }
-
   let editor = new BimpEditor({
     state,
     parent,
     components: [
-      drawingCanvas({ paletteBuilder: stitchPalette }),
+      drawingCanvas({
+        paletteBuilder: buildSymbolPalette(await initPalette()),
+      }),
       grid(),
       highlight({ cell: true }),
       toolbox({ tools: { brush, flood, line, rect, shift, pan } }),
       controlPanel(),
-
       numberGutter({ size: 20, gutterPos: "left", gutterFunc: bottomLeft }),
       numberGutter({
         size: 20,
         gutterPos: "right",
         gutterFunc: bottomLeft,
       }),
-
       numberGutter({ size: 20, gutterPos: "top", gutterFunc: bottomLeft }),
       numberGutter({
         size: 20,
@@ -85,6 +94,4 @@ export function knittingPattern(parent) {
       }),
     ],
   });
-
-  editor.zoomToFit();
 }

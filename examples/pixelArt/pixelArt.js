@@ -25,18 +25,6 @@ const startPalette = [
   "#ad6dca",
 ];
 
-const needlePalette = ["#20344c", "#faead6"];
-
-function bottomLeft({ bitmap }, gutterPos, size) {
-  if (gutterPos == "bottom" || gutterPos == "top") {
-    return Array.apply(null, Array(bitmap.width)).map((x, i) => i + 1);
-  } else if (gutterPos == "left" || gutterPos == "right") {
-    return Array.apply(null, Array(bitmap.height))
-      .map((x, i) => i + 1)
-      .reverse();
-  }
-}
-
 export function pixelArt({ parent = document.body }) {
   let startState = {
     bitmap: Bimp.empty(50, 50, 1),
@@ -52,23 +40,15 @@ export function pixelArt({ parent = document.body }) {
     components: [
       drawingCanvas({ paletteBuilder: buildHexPalette(startPalette) }),
       outline(),
+      grid(),
       toolbox({
         tools: { brush, flood, line, rect, pan, shift },
         container: "sidebarPrimary",
       }),
       controlPanel(),
-      numberGutter({ size: 20, gutterPos: "left", gutterFunc: bottomLeft }),
-      numberGutter({
-        size: 20,
-        gutterPos: "right",
-        gutterFunc: bottomLeft,
-      }),
-      numberGutter({ size: 20, gutterPos: "top", gutterFunc: bottomLeft }),
-      numberGutter({
-        size: 20,
-        gutterPos: "bottom",
-        gutterFunc: bottomLeft,
-      }),
+      numberGutter({ size: 20, gutterPos: "left" }),
+
+      numberGutter({ size: 20, gutterPos: "top" }),
     ],
   });
 }

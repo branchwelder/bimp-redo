@@ -3,6 +3,7 @@ import { html, render } from "lit-html";
 function symbolPalette({ symbols, showSelect = true }, { state, dispatch }) {
   let selected = state.paletteIndex;
   let dom = document.createElement("div");
+  dom.style.flexDirection = "inherit";
 
   function renderSelection() {
     if (!showSelect) return;
@@ -13,7 +14,6 @@ function symbolPalette({ symbols, showSelect = true }, { state, dispatch }) {
             flex-direction: inherit;
             gap: 3px;
             justify-content: center;
-            height: 50px;
           }
           .palette-select > img {
             border: 1px solid black;
@@ -62,6 +62,7 @@ function hexPalette(
 ) {
   let selected = state.paletteIndex;
   let dom = document.createElement("div");
+  dom.style.flexDirection = "inherit";
 
   function renderSelection() {
     if (!showSelect) return;

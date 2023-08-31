@@ -59,13 +59,17 @@ function defaultLayout(parent) {
         .bimp-sidebar-secondary {
           display: flex;
           flex-direction: column;
-          align-items: center;
+          /* align-items: center; */
+          justify-content: space-between;
+          padding: 4px;
         }
         .bimp-taskbar-primary,
         .bimp-taskbar-secondary {
           display: flex;
           align-items: center;
           justify-content: center;
+          padding: 4px;
+          gap: 5px;
         }
       </style>
       <div class="bimp-container">

@@ -1,7 +1,7 @@
 import { Bimp } from "/Bimp";
 import { BimpEditor } from "/BimpEditor";
 
-import { brush, flood, line, rect, shift, pan } from "/tools";
+import { brush, flood, line, rect, shift } from "/tools";
 import { toolbox } from "/toolbox";
 import { controlPanel } from "/controlPanel";
 

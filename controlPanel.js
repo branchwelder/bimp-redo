@@ -6,9 +6,13 @@ function resizeControl() {
     return html`<style>
         .resize-control {
           font-size: 0.8rem;
-          display: grid;
-          grid-template-columns: auto 1fr max-content 1fr;
+          display: flex;
+          align-items: center;
+          flex-direction: inherit;
           gap: 5px;
+        }
+        .control-group {
+          display: flex;
         }
         .size-input {
           max-width: 40px;
@@ -22,48 +26,51 @@ function resizeControl() {
       </style>
       <div class="resize-control">
         <span>Width</span>
-        <button
-          class="minus"
-          @click=${() =>
-            dispatch({
-              bitmap: bitmap.resize(bitmap.width - 1, bitmap.height),
-            })}></button>
-        <input
-          type="number"
-          class="size-input"
-          .value=${live(bitmap.width)}
-          @change=${(e) =>
-            dispatch({
-              bitmap: bitmap.resize(Number(e.target.value), bitmap.height),
-            })} />
-        <button
-          class="plus"
-          @click=${() =>
-            dispatch({
-              bitmap: bitmap.resize(bitmap.width + 1, bitmap.height),
-            })}></button>
+        <div class="control-group">
+          <button
+            class="minus"
+            @click=${() =>
+              dispatch({
+                bitmap: bitmap.resize(bitmap.width - 1, bitmap.height),
+              })}></button>
+          <input
+            type="number"
+            class="size-input"
+            .value=${live(bitmap.width)}
+            @change=${(e) =>
+              dispatch({
+                bitmap: bitmap.resize(Number(e.target.value), bitmap.height),
+              })} />
+          <button
+            class="plus"
+            @click=${() =>
+              dispatch({
+                bitmap: bitmap.resize(bitmap.width + 1, bitmap.height),
+              })}></button>
+        </div>
         <span>Height</span>
-
-        <button
-          class="minus"
-          @click=${() =>
-            dispatch({
-              bitmap: bitmap.resize(bitmap.width, bitmap.height - 1),
-            })}></button>
-        <input
-          type="number"
-          .value=${live(bitmap.height)}
-          class="size-input"
-          @change=${(e) =>
-            dispatch({
-              bitmap: bitmap.resize(bitmap.width, Number(e.target.value)),
-            })} />
-        <button
-          class="plus"
-          @click=${() =>
-            dispatch({
-              bitmap: bitmap.resize(bitmap.width, bitmap.height + 1),
-            })}></button>
+        <div class="control-group">
+          <button
+            class="minus"
+            @click=${() =>
+              dispatch({
+                bitmap: bitmap.resize(bitmap.width, bitmap.height - 1),
+              })}></button>
+          <input
+            type="number"
+            .value=${live(bitmap.height)}
+            class="size-input"
+            @change=${(e) =>
+              dispatch({
+                bitmap: bitmap.resize(bitmap.width, Number(e.target.value)),
+              })} />
+          <button
+            class="plus"
+            @click=${() =>
+              dispatch({
+                bitmap: bitmap.resize(bitmap.width, bitmap.height + 1),
+              })}></button>
+        </div>
       </div>`;
   }
   return { view };
@@ -74,11 +81,12 @@ function controlPanelExtension(
   { controls = [resizeControl()], container = "sidebarPrimary" }
 ) {
   const dom = document.createElement("div");
+  dom.style.flexDirection = "inherit";
+
   parent[container].appendChild(dom);
 
   function view() {
-    return html`<style></style>
-      <div>${controls.map((control) => control.view(state, dispatch))}</div>`;
+    return controls.map((control) => control.view(state, dispatch));
   }
 
   render(view(), dom);

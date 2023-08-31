@@ -9,8 +9,9 @@ import { grid } from "/grid";
 
 import { drawingCanvas } from "/drawingCanvas";
 import { outline } from "/outline";
-import { highlight } from "/highlight";
 import { buildHexPalette } from "/palette";
+
+import art from "./art.json";
 
 const startPalette = [
   "#20344c",
@@ -27,7 +28,7 @@ const startPalette = [
 
 export function pixelArt({ parent = document.body }) {
   let startState = {
-    bitmap: Bimp.empty(50, 50, 1),
+    bitmap: Bimp.fromJSON(art),
     selection: [],
     aspectRatio: [1, 1],
     scale: 1,

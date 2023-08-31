@@ -17,6 +17,8 @@ import slipUrl from "./stitchSymbols/slip.png";
 import tuckUrl from "./stitchSymbols/tuck.png";
 import purlUrl from "./stitchSymbols/purl.png";
 
+import defaultPattern from "./pyramids.json";
+
 async function initPalette() {
   const knit = new Image();
   knit.src = knitUrl;
@@ -31,24 +33,14 @@ async function initPalette() {
   purl.src = purlUrl;
   await purl.decode();
 
-  const symbols = [
-    { image: knit, title: "Knit" },
-    { image: purl, title: "Purl" },
-    { image: slip, title: "Slip" },
-    { image: tuck, title: "Tuck" },
-  ];
-  console.log(symbols);
-
-  return { symbols };
-
-  // return {
-  //   symbols: [
-  //     { image: knit, title: "Knit" },
-  //     { image: purl, title: "Purl" },
-  //     { image: slip, title: "Slip" },
-  //     { image: tuck, title: "Tuck" },
-  //   ],
-  // };
+  return {
+    symbols: [
+      { image: knit, title: "Knit" },
+      { image: purl, title: "Purl" },
+      { image: slip, title: "Slip" },
+      { image: tuck, title: "Tuck" },
+    ],
+  };
 }
 
 function bottomLeft({ bitmap }, gutterPos, size) {
@@ -63,7 +55,7 @@ function bottomLeft({ bitmap }, gutterPos, size) {
 
 export async function knittingPattern(parent) {
   let state = {
-    bitmap: Bimp.empty(20, 20, 1),
+    bitmap: Bimp.fromJSON(defaultPattern),
     aspectRatio: [1, 1],
     scale: 1,
     pan: { x: 0, y: 0 },

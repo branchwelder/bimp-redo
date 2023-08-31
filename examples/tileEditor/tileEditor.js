@@ -9,6 +9,11 @@ import { drawingCanvas } from "/drawingCanvas";
 import { outline } from "/outline";
 import { buildHexPalette } from "/palette";
 
+import startingTile from "./defaultBitmap.json";
+
+const startBimp = Bimp.fromJSON(startingTile);
+const startMap = Bimp.fromTile(200, 200, startBimp);
+
 const startPalette = [
   "#20344c",
   "#faead6",
@@ -24,7 +29,7 @@ const startPalette = [
 
 export function tileEditor(tileParent, mapParent) {
   let mapState = {
-    bitmap: Bimp.empty(200, 200, 1),
+    bitmap: startMap,
     aspectRatio: [1, 1],
     scale: 1,
     pan: { x: 0, y: 0 },
@@ -42,7 +47,7 @@ export function tileEditor(tileParent, mapParent) {
     ],
   });
   let tileState = {
-    bitmap: Bimp.empty(16, 16, 1),
+    bitmap: startBimp,
     aspectRatio: [1, 1],
     scale: 1,
     pan: { x: 0, y: 0 },

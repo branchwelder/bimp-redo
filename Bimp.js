@@ -5,6 +5,10 @@ export class Bimp {
     this.pixels = new Uint8ClampedArray(pixels);
   }
 
+  static fromJSON(jsonObj) {
+    return new Bimp(jsonObj.width, jsonObj.height, jsonObj.pixels);
+  }
+
   static empty(width, height, color) {
     let pixels = new Array(width * height).fill(color);
     return new Bimp(width, height, pixels);
